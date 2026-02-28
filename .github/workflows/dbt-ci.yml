@@ -29,16 +29,29 @@ jobs:
         shell: bash
         run: |
           mkdir -p /home/runner/.dbt
-          echo "${{ secrets.DBT_PROFILES_YML }}" > /home/runner/.dbt/profiles.yml
-          echo "${{ secrets.DBT_PRIVATE_KEY }}" > /home/runner/.dbt/rsa_key
+
+          cat > /home/runner/.dbt/profiles.yml <<'EOF'
+${{ secrets.DBT_PROFILES_YML }}
+EOF
+
+          cat > /home/runner/.dbt/rsa_key <<'EOF'
+${{ secrets.DBT_PRIVATE_KEY }}
+EOF
+
           chmod 600 /home/runner/.dbt/rsa_key
 
+      - name: Sanity check key delimiters
+        shell: bash
+        run: |
+          sed -n '1,2p' /home/runner/.dbt/rsa_key
+          tail -n 2 /home/runner/.dbt/rsa_key
+          
       - name: Install dbt deps
-        run: dbt deps
+        run: dbt deps --profiles-dir /home/runner/.dbt
 
       - name: Debug connection
-        run: dbt debug --target dev
+        run: dbt debug --profile BTC --target dev --profiles-dir /home/runner/.dbt
 
       - name: Run models + tests
-        run: dbt build --target dev
+        run: dbt build --profile BTC --target dev --profiles-dir /home/runner/.dbt
 
