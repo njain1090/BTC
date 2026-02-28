@@ -1,17 +1,23 @@
-
-target/
-dbt_packages/
-logs/
+# macOS
+.DS_Store
+**/.DS_Store
 
 # Python
 venv/
 __pycache__/
 *.pyc
 
-# dbt
+# dbt artifacts
 target/
-dbt_packages/
 logs/
+state/
+dbt_packages/
 
-# macOS
-.DS_Store
+# Keys / secrets
+*.p8
+*.pem
+*.key
+*.pub
+
+# Local dbt profiles (should never be in repo)
+profiles.yml
