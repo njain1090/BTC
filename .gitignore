@@ -2,3 +2,16 @@
 target/
 dbt_packages/
 logs/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# dbt
+target/
+dbt_packages/
+logs/
+
+# macOS
+.DS_Store
