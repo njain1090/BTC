@@ -8,3 +8,56 @@ models:
         tests:
           - unique
           - not_null
+
+  - name: stg_btc_outputs
+    tests:
+    - dbt_utils.equality:
+        arguments:
+          compare_model: ref('stg_btc_outputs_py')
+          compare_columns: ["HASH_KEY", "OUTPUT_ADDRESS", "OUTPUT_VALUE"]
+
+  - name: whale_alert
+    latest_version: 2
+    config:
+      contract:
+        enforced: true
+    columns:
+    - name: INVOCATION_ID
+      data_type: string
+    - name: output_address
+      data_type: string
+      data_tests:
+        - assert_valid_btc_address
+    - name: total_sent
+      data_type: float
+    - name: tx_count
+      data_type: int
+    - name: total_sent_usd
+      data_type: float
+
+    versions:
+    - v: 1
+      deprecation_date: 2026-01-01
+      config:
+        enabled: false
+    - v: 2
+      columns:
+        - include: all
+          exclude: [total_sent_usd]
+
+
+exposures:
+  - name: btc_whale_alert_exposure
+    label: BTC Whale alert
+    type: dashboard
+    maturity: high
+    url: https://lookerstudio.google.com/reporting/24c6fb5a-86b7-4db0-a881-b0fe122617c3
+    description: >
+      BTC Whale alert transactions report
+
+    depends_on:
+      - ref('whale_alert', v=2)
+
+    owner:
+      name: Neha Jain
+
